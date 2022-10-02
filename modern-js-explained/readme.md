@@ -303,9 +303,9 @@ Note that we're installing 3 separate packages as dev dependencies.
 
 - `@babel/core` is the main part of `babel`
 
--`@babel/preset-env` is a preset _defining which new JS features to transpile_
+- `@babel/preset-env` is a preset _defining which new JS features to transpile_
 
--`@babel-loader` is a package to **enable babel** to work with `webpack`. We can configure `webpack` to use `babel-loader` by editing the `webpack.config.js` as follows:
+- `@babel-loader` is a package to **enable babel** to work with `webpack`. We can configure `webpack` to use `babel-loader` by editing the `webpack.config.js` as follows:
 
 ### Transpile code using Babel with Webpack
 
@@ -377,3 +377,98 @@ We're almost done, but there's still some unpolished edges in our workflow. If w
 - We also need to _re-run the webpack command each time, we change the JavaScript_.
 
 so we'll look at some convenience tools to solve the issues.
+
+## Using a task runner (npm scripts)
+
+Now that we're invested in using a _build step_ to work with JavaScript modules, it makes sense to use a `task runner`, which is a tool that _automates different parts of the build process_.
+
+For frontend development, tasks include minifying code, optimizing images, running tests..
+
+In 2013, `Grunt` was the most popular **frontend task runner**, with `Gulp` following shortly.
+
+Let's write some npm scripts to make using webpack easier. This involves simply changing the `package.json` as follows:
+
+`package.json`
+
+```js
+"scripts": {
+        "build": "webpack --progress --mode=production",
+        "watch": "webpack --progress --watch"
+    },
+```
+
+Here we've added 2 new scripts `build` and `watch`. To _run the build_ script, you can enter in the command line:
+
+> npm run build
+
+This will run `webpack` (using configuration from the **`webpack.config.js`** we made earlier) with the `--progress` option to show the _progress percent_ and the `--mode=production` option to **minify the code** in production.
+
+> npm run watch
+
+This uses the --watch option to **automatically re-run the webpack** each time any `JavaScript` file changes and shows the `progress percent` of the build, which is great for development.
+
+![image](https://user-images.githubusercontent.com/85299439/193450067-2b66da2e-45d2-40c7-b467-5c0414ebd006.png)
+
+Note that the `scripts` in `package.json` can _run webpack without having to specify the full path_ ./node*modules/.bin/webpack , since `node.js` \_knows the location* of each npm module path.
+
+## webpack-dev-server
+
+We can make things even sweeter by installing `webpack-dev-server`, a separate tool which provides a simple `web server` **with live reloading**.
+
+> npm install webpack-dev-server --save-dev
+
+Then add an npm script to `package.json`:
+
+```js
+"scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack --progress --mode=production",
+        "watch": "webpack --progress --watch",
+        "serve": "webpack-dev-server --open"
+    }
+```
+
+Now you can _start the dev server_ by running the command:
+
+> npm run serve
+
+And add config for `webpack-dev-server` in `webpack.config.js`. This is mentioned in Official docs as well:
+`webpack.config.js`
+
+```js
+devServer: {
+        static: {
+            directory: path.join(__dirname, '/')
+        },
+        compress: true,
+        port: 9000,
+        devMiddleware: {
+            writeToDisk: true
+        },
+    },
+```
+
+This will automatically open `index.html` website in your browser with an address of `localhost:8080` (by default). Any time you can change JavaScript/HTML in `index.js` webpack-dev-server will _rebuild its own bundled JavaScript and refresh the browser_.
+
+### To avoid creating too many main.js files for hot.update.js & hot.update.json
+
+Add the below options (hotUpdateChunkFilename & hotUpdateMainFileName) to `output property` of `webpack.config.js`
+
+`webpack.config.js`
+
+```js
+output: {
+        filename: 'main.js',
+        publicPath: 'dist',
+        hotUpdateChunkFilename: 'hot/hot-update.js',
+        hotUpdateMainFilename: 'hot/hot-update.json'
+    },
+```
+
+### What next?
+
+There are plenty more options with both `webpack` and `webpack-dev-server`. You can also _make npm scripts for running other tasks_, such as **converting SASS to CSS**, **running tests** -- anything that has a `command line tool`.
+
+## Conclusion
+
+We went from plain HTML and JS to using a **package manager** to automatically download _3rd party packages_, a **module bundler** to create a **single script file**, a **transpiler** to use use **future JavaScript features**, a **task runner** to `automate` different parts of the **build process**.

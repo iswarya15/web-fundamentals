@@ -1,9 +1,9 @@
 import moment from "moment";
-var dayjs = require('dayjs');
+import dayjs from "dayjs";
 
 console.log('Hello from JavaScript');
 console.log('MomentJS => ', moment().format());
-console.log('DayJS => ', dayjs().format('{YYYY} MM-DDTHH:mm:ss SSS [Z] A'));
+console.log('DayJS => ', dayjs().format('{YYYY} MM-DDTHH:mm:ss SSS [Z] A'))
 
 // ES2022 
 const arr = [1, 2, 3, 4];
