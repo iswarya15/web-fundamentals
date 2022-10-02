@@ -278,3 +278,102 @@ Overall this may not seem like much, but there are huge advantages to this workf
 - Having a `single Javascript bundle file` is often better for `performance`.
 
 Now that we added a build step, there are some other powerful features we can add to our development workflow!!
+
+## Transpiling code for new features (Babel)
+
+Transpiling the code means **converting** the code in one language to code in _another similar language_.
+
+This is an important part of frontend development, since browsers are slow to add new features, _new languages_ were created with experimental features that `transpile` to the `browser compatible languages`.
+
+- For CSS, there's **SASS/LESS/STYLUS** to name a few. For JavaScript, the most famous transpiler for a while was `CoffeeScript` (2010), nowadays most people use **Babel** or **TypeScript**.
+
+- `CoffeeScript` is a language _focussed on improving_ JavaScript.
+
+- `Babel` is _not a new language_ but a transpiler that `transpiles` _next generation JavaScript_ (ES2015 and beyond) with features not yet available to all browsers to older compatible JavaScript (ES5).
+
+- `TypeScript` is a language identical to JavaScript, but also adds **static typing**.
+
+## How to install Babel
+
+Let's look at an example on how to use `babel` with our existing `webpack` build. To install babel from command line,
+
+> npm install @babel/core @babel/preset-env babel-loader --save-dev
+
+Note that we're installing 3 separate packages as dev dependencies.
+
+- `@babel/core` is the main part of `babel`
+
+-`@babel/preset-env` is a preset _defining which new JS features to transpile_
+
+-`@babel-loader` is a package to **enable babel** to work with `webpack`. We can configure `webpack` to use `babel-loader` by editing the `webpack.config.js` as follows:
+
+### Transpile code using Babel with Webpack
+
+`webpack.config.js`
+
+```js
+module.exports = {
+  mode: "development",
+  entry: "./index.js",
+  output: {
+    filename: "main.js",
+    publicPath: "dist",
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+          },
+        },
+      },
+    ],
+  },
+};
+```
+
+This syntax can be confusing (fortunately it's not something we'll be editing often).
+
+We're telling `webpack` to look for **any .js files** (excluding ones in the node_modules) and apply babel transpilation using `babel-loader` with the `@babel/preset-env` preset.
+
+Now that everything is setup, we can write `ES2022` code in our JavaScript! Here's an example of an [ES2022 array at](https://dev.to/msabir/es2022-brings-at-for-array-4o5o) in the index.js:
+
+```js
+// ES2022
+const arr = [1, 2, 3, 4];
+console.log("ES2022 Array.at() =>", arr.at(1));
+```
+
+We can also use the `ES2015 import statement`, instead of the `require` for loading modules:
+
+`index.js`
+
+```js
+import moment from "moment";
+
+console.log(moment().format());
+```
+
+Most of the modern browsers support all ES2015/ES2022 features, so it can be hard to tell if babel did its job. You can _test in an older browser_, search for `main.js` to find the **transpiled line of code**:
+
+`main.js`
+
+```js
+console.log("ES2022 Array.at() =>", arr[1]);
+```
+
+Here you can see **babel transpiled** the **ES2022 Array.at()** to regular JavaScript to _maintain browser compatibility_.
+
+### Improving performance
+
+We're almost done, but there's still some unpolished edges in our workflow. If we're concerned about performance, we can do the following:
+
+- We should be **minifying** the _bundle file_.
+
+- We also need to _re-run the webpack command each time, we change the JavaScript_.
+
+so we'll look at some convenience tools to solve the issues.
