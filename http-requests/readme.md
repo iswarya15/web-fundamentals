@@ -133,3 +133,25 @@ The `SSL/TLS Handshake` involves a series of steps where the _browser and server
 When a `secure connection` is established through the HTTPS, the _green padlock icon_ is displayed in the _browsers address bar_.
 
 ![0-g7q-rF8JTGp7fs19](https://user-images.githubusercontent.com/85299439/193229407-31ae628c-0d39-43b2-ae82-b8a030314792.png)
+
+### What is Idempotent HTTP Methods?
+
+An HTTP Method is `Idempotent` if an _identical request_ can be made _once or several times_ in a row with the _same effect while leaving the server in the same state_.
+
+- **POST** - When we invoke the POST request N times, we will have _created N new resource on the server_. So **POST is not idempotent**.
+
+- **GET, HEAD, TRACE** - These methods _never change the resource state_ on the server. So **GET, HEAD, TRACE are idempotent**.
+
+- **PUT** - PUT requests are used to _update the resource state_. If you _invoke a PUT API N times_, the very `first` request will update the resource, the other `N-1` requests will _just overwrite the same resource state again and again_ - effectively not changing anything.
+
+**Hence PUT is idempotent**.
+
+- **DELETE** - When you invoke _n similar DELETE requests_, the first request will delete the resource and the response will be 200 (ok).
+
+Other `n-1` requests will return 404 (not found).
+
+Clearly the response is different from the first request, but _there is no change of state for any resource on the server because the original had already been deleted_.
+
+**So delete is idempotent**.
+
+**PUT vs POST** - PUT is idempotent: calling it once or several times successively has the _same effect_ (i.e no side effect), where successful POST may have additional effects.
