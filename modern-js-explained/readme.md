@@ -130,7 +130,7 @@ So the _good thing_ is we can now use `npm` to _download and update our packages
 
 ### Globally defined variable
 
-- So for the longest time, organizing JavaScript code in multiple files required you to load each file with _variables shared globally_.
+- So for the longest time, organizing JavaScript code in multiple files required you to load each file with _globally defined variable_.
 
 - This is actually what we're doing with the above `moment.js` example - the entire `moment.min.js` file is **loaded in the HTML**, which **defines a global variable** `moment` which is then _available to any file loaded after_ `moment.min.js` (regardless of whether or not it needs it).
 
