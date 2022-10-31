@@ -30,18 +30,32 @@ In the above example, `bootstrap.min.ts` is the first file to load in your app. 
 
 - **Loaders** - It tells JavaScript how to **resolve non-javascript** modules. It takes the resource file and returns the modified state.
 
+  - `ts-loader` : In the below example, we are telling `webpack` to look for **any .ts files** and apply `ts-loader` _transpilation to convert_ `typescript` code to browser compatible JS code.
+
+  - `css-loader` : To make sure our app knows about the css file, we can import it to the `index.js` file. `Webpack` would now notice the css file and use `css-loader` on it.
+
+  ![image](https://user-images.githubusercontent.com/85299439/198972063-a318c551-186c-466d-b4ea-f09c6f1115c3.png)
+
+  `css-loader` _converts the css to valid javascript code_ in the emitted `main.js`. But the **CSS is not applied to the DOM** yet. To _apply the javascript to DOM_, we need to use `style-loader`.
+
+  - `style-loader` : adds CSS to DOM by injecting a _style tag_. We're **loading css without having to connect to link tag in HTML file**. It's all _happening through Javascript_.
+
+  ![image](https://user-images.githubusercontent.com/85299439/198975182-18fade36-7306-49f7-8435-b085cc3abf56.png)
+
 ```js
 modules: {
     rules: {
         {
             test: /\.ts$\,
             use: 'ts-loader'
+        },
+        {
+            test: /\.css$\,
+            use: ["style-loader","css-loader"]
         }
     }
 }
 ```
-
-In the above example, we are telling `webpack` to look for **any .ts files** and apply `ts-loader` _transpilation to convert_ `typescript` code to browser compatible JS code.
 
 You can similarly have loaders like css, babel etc. All the files other than `JavaScript` are converted into `JS Modules` by these transpilation.
 
