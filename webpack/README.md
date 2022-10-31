@@ -36,7 +36,7 @@ In the above example, `bootstrap.min.ts` is the first file to load in your app. 
 
   ![image](https://user-images.githubusercontent.com/85299439/198972063-a318c551-186c-466d-b4ea-f09c6f1115c3.png)
 
-  `css-loader` _converts the css to valid javascript code_ in the emitted `main.js`. But the **CSS is not applied to the DOM** yet. To _apply the javascript to DOM_, we need to use `style-loader`.
+  `css-loader` _converts the css to valid javascript code_ in the emitted `main.js`. But the **CSS is not applied to the DOM** yet. To _apply the javascript to DOM_, we need to use `style-loader`. This is done by **chaining the loaders**. Output of one loader is given as input to another loader.
 
   - `style-loader` : adds CSS to DOM by injecting a _style tag_. We're **loading css without having to connect to link tag in HTML file**. It's all _happening through Javascript_.
 
@@ -50,8 +50,10 @@ modules: {
             use: 'ts-loader'
         },
         {
-            test: /\.css$\,
-            use: ["style-loader","css-loader"]
+            test: /\.scss$/,
+            use: ["style-loader", //3. injects styles to DOM
+                  "css-loader", //2. Turns css into commonjs
+                  "sass-loader"] //1.  Turns sass into css
         }
     }
 }
@@ -63,16 +65,23 @@ You can also `filter` through these modules by using properties like **exclude, 
 
 Example: We don't want to transpile any of the node_modules file. Hence we add `exclude: 'node_modules'`
 
-There is also a way to _chain loaders_ such that loaders that perform one operation will be transformed once and then you can chain them together.
+## Cache Busting and Plugins
 
-```js
-rules: [
-  {
-    test: /\.less$/,
-    use: ["css-loader", "style-loader", "less-loader"],
-  },
-];
-```
+- When a `static file` gets `cached` it can be _stored for very long periods_ of time before it ends up expiring. This can be an annoyance in the event that you make an **update to a site however**, since the cached version of the file is stored in your client's browsers, they may be _unable to see the changes made_.
+
+- Browser remembers the file name and if the copy of the filename already exists in browser cache, it uses the same. Notice the browser fetches from `disk cache`.
+
+![image](https://user-images.githubusercontent.com/85299439/199000936-518fe591-49dc-43c5-96f3-04d91e7fe07f.png)
+
+- `Cache Busting` solves the browser caching issue by using a **unique file version identifier** i.e hash - refer below image, _github-(hash).css_ to tell the browser that a new version of the file is available.
+
+- Therefore the browser _doesn't retrieve the old file from cache_ but **rather makes a request to the server for the new file**.
+
+> How do we include these _dynamically generated hash files_ in the `index.html` (right now the script tag refers to main.js) ?!
+
+Answer: We don't write the script ourselves. We are going to have _webpack build HTML file_ for us so it would come up with the right script name and stick it to the bottom but to do that we need to learn about `Plugins`.
+
+[Read more on Cache Busting.](https://www.keycdn.com/support/what-is-cache-busting)
 
 - **Plugins** - An plugin is an `ES5 class` which implements an _apply function_ and allow you to hook into the entire compilation lifecycle.
 
