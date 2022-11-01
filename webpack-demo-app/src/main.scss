@@ -1,4 +1,4 @@
-$primary: teal;
-$danger: purple;
+$primary: rgb(74, 74, 120);
+$danger: rgb(245, 129, 111);
 
 @import "~bootstrap/scss/bootstrap"; //tilde path resolving is done by webpack. sass/scss doesn't have such resolver built in.

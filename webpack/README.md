@@ -119,8 +119,6 @@ module.exports = {
 };
 ```
 
-Note: Images aren't working at this point. We'll come back to that
-
 ![image](https://user-images.githubusercontent.com/85299439/199162490-8062a74a-f27c-47cb-b436-a6eaf4dbc07b.png)
 
 By adding the plugin to webpack config file, webpack generated a file `dist/index.html`. This file contains the **recently updated script** file. But our content is missing in the newly generated `index.html` file. Let's create _our own template_.
@@ -143,7 +141,83 @@ By adding the plugin to webpack config file, webpack generated a file `dist/inde
 
 Now `dist/index.html` would contain content from `src/template.html` and _recently changed script file_.
 
+Note: Images aren't working at this point. We'll come back to that
+
 ![image](https://user-images.githubusercontent.com/85299439/199166029-5f4be90b-0c70-437f-99fd-d6cf92cd774e.png)
+
+## Splitting DEV & PRODUCTION
+
+- Broke our `webpack.config` file into 3 files
+
+- `webpack.common.js`, `webpack.dev.js`, and `webpack.prod.js`
+
+  - In dev version, we don't need content hash, but we do need in prod version.
+
+- install `webpack-merge` to _share the common functionality._
+
+`webpack.dev.js`
+
+```js
+const path = require("path");
+const common = require("./webpack.common");
+const merge = require("webpack-merge");
+
+module.exports = merge(common, {
+  mode: "development",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+});
+```
+
+`webpack.prod.js`
+
+```js
+const path = require("path");
+const common = require("./webpack.common");
+const merge = require("webpack-merge");
+
+module.exports = merge(common, {
+  mode: "production",
+  output: {
+    filename: "main.[hash].js",
+    path: path.resolve(__dirname, "dist"),
+  },
+});
+```
+
+- updated our `package.json` to use the **new config files**.
+
+```json
+    "scripts": {
+        "start": "webpack --config webpack.dev.js",
+        "build": "webpack --config webpack.prod.js"
+    },
+```
+
+`npm start`: this calls webpack with dev config, webpack generates `dist/index.html` with script tag that contains **no content hash**.
+
+![image](https://user-images.githubusercontent.com/85299439/199172190-3246f798-0f7d-4936-8afc-338411a1dadb.png)
+
+`npm build`: webpack generates `dist/index.html` with script tag that contains _bundled js file with hash attached_ to it. If we check the bundled script file, the code is _minified_.
+
+![image](https://user-images.githubusercontent.com/85299439/199172716-bb0338a7-5d5b-4c8a-83a5-8bb17d6fa52f.png)
+
+`Minified Code`:
+
+![image](https://user-images.githubusercontent.com/85299439/199173087-83a8b827-9578-482d-9c9c-3a7e324ff0a9.png)
+
+## webpack-dev-server
+
+To avoid entering the command `npm start` and re-build, each time we change something we can install `webpack-dev-server`. Configure dev server in `package.json` as below:
+
+```json
+    "scripts": {
+        "start": "webpack-dev-server --config webpack.dev.js --open",
+        "build": "webpack --config webpack.prod.js"
+    },
+```
 
 ### How does webpack work ?
 
