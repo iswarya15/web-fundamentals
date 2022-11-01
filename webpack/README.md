@@ -267,6 +267,12 @@ After running npm run build, there is a `dist/imgs` folder generated which consi
 
 ![image](https://user-images.githubusercontent.com/85299439/199204650-55af322d-5270-4034-865c-414917c638a3.png)
 
+## Vendor.js & Multiple Entrypoints
+
+- Now we have 2 entry files and 2 bundles.
+- The `vendor` file has code that is _less likely to change_, 3rd party libraries
+- The `main file` has _all of our app code_
+
 ## Summary of whole process
 
 Webpack first reads the **entry point**, and it goes through the `resolver` to verify that it _exists or not_.
