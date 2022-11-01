@@ -2,31 +2,49 @@
 
 ## Why do we need webpack?
 
-Consider a file `index.js` which imports two files `file1.js` and `file2.js` and `file2.js` is dependent on `file1.js`. In this case, how the _browser know will know_ which _file to load first_ such that it yields the desired result
+Webpack is a **module bundler** for modern JavaScript applications. The time before libraries, frameworks, and build tools like Webpack, we _just need to include a single script in our HTML_ such as this then solve problems right away:
 
-![image](https://user-images.githubusercontent.com/85299439/193467717-083a2cb8-7ff5-4a90-8c89-6fdca0876fbc.png)
+```html
+<head>
+  <script src="main.js" type="text/javascript"></script>
+</head>
+```
 
-**Solution**: Webpack
+But then, libraries came so we have to include them one by one and in the _proper order to make them work_ interdependently:
 
-### How webpack solves this problem for us?
+```html
+<head>
+  <script src="library1.js" type="text/javascript"></script>
+  <script src="library2.js" type="text/javascript"></script>
+  <script src="script.js" type="text/javascript"></script>
+</head>
+```
 
-Webpack is a `module bundler` which **builds and loads modules synchronously**. It converts dependencies into modules and makes sure to pull the dependencies and modules at the right time in the correct scope.
+These are the problems webpack was trying to solve:
 
-All the dependencies and modules are _loaded in one file_ which will be downloaded in the browser.
+### Automation
 
-### How webpack work on top of the hood?
+You might not be a big fan of including every **javascript libraries in your HTML headers** but prefer to use npm for including such libraries you want to use in your functionality
 
-Let's look at the initial configuration for `webpack.config.js` file
+### Load Speed
 
-- **Entry** - This is used as the entry point for its **dependency graph**.
+**Loading individual scripts** within a webpage is _very costly_ if we were to create a modern web app.
 
-![image](https://user-images.githubusercontent.com/85299439/193468175-cadd98b7-f0a2-4ebd-873d-b5d5584df0f6.png)
+Webpack helps us _improve the loading speed_ by **bundling every javascript modules** we have into one since we only ask once in fetching our script from the webserver.
 
-In the above example, `bootstrap.min.ts` is the first file to load in your app. Webpack will use this file to build `dependency graph`.
+### Dependency Issues
 
-- **Output** - It defines the _absolute path_ to distribute bundles.
+As mentioned earlier, before the dawn of webpack, we _used to arrange our scripts and libraries in the proper order_ to connect the dependencies correctly:
 
-![image](https://user-images.githubusercontent.com/85299439/193468254-2363a89f-c9f4-412e-94a5-dc1c298c5fdc.png)
+With ES6 features, we can **import and export javascript modules** which are identified by `webpack` and _included in the bundle_.
+
+### Initial webpack config
+
+- **Entry** - entry point to build **dependency graph**.
+
+In the `webpack-demo-app`, `index.js` is the first file to load in your app. Webpack will use this file to build `dependency graph`.
+
+- **Output** - It defines the _absolute path_ for the output bundles.
 
 - **Loaders** - It tells JavaScript how to **resolve non-javascript** modules. It takes the resource file and returns the modified state.
 
@@ -248,38 +266,6 @@ module.exports = merge(common, {
 After running npm run build, there is a `dist/imgs` folder generated which consists of the required image. Note the `index.html` now links to the d*ynamically generated image*.
 
 ![image](https://user-images.githubusercontent.com/85299439/199204650-55af322d-5270-4034-865c-414917c638a3.png)
-
-### How does webpack work ?
-
-**Tapable** - It is the backbone of the plugin system. It allows us to _mix your code_ with an _existing class_ and make **use of existing functions** like `apply plugins parallel` or `apply plugins async` etc.
-
-A simple basic plugin declaration would look like:
-
-```js
-class BasicPlugin {
-  apply(compiler) {
-    compiler.apply("make", (compilation) => {
-      console.log("I now have access to compilation!");
-    });
-  }
-}
-
-module.exports = BasicPlugin;
-```
-
-There are some `Tapable instances` which are responsible for the working of webpack.
-
-**Compiler** - It is the `central dispatch`, kind of start or stop which _delegates the top level events_ that are happening when webpack runs or finishes.
-
-**Compilation** - It **creates and runs the dependency graph algorithm**.
-
-**Resolver** - It helps in _finding files and dependencies_. For example, `index.js` has imports specified with partial/relative path or any other dependencies, _resolver helps in finding the file from the import path_ and build dependency graph.
-
-**Module Factory** - It takes the `resolved request` and collects the source of that file and returns `Module Object`.
-
-**Parser** - Converts raw code into an `AST` such that it can be easily traversed. Starts by finding all the **require, imports** and creates `dependency object` out of it.
-
-**Template** - Responsible for binding data for your modules and **creates the code that we see in the bundle**.
 
 ## Summary of whole process
 
