@@ -219,6 +219,36 @@ To avoid entering the command `npm start` and re-build, each time we change some
     },
 ```
 
+### HTML-loader
+
+- Install `html-loader` and configure in `webpack.common.js` to automatically _require the images_.
+
+```js
+{
+    test: /\.html$/,
+    use: ["html-loader"]
+}
+```
+
+- add assetModuleFilename: "images/[name].[hash][ext]" to the output field of `webpack.prod.js` to generate filenames with hash, as below
+
+`webpack.prod.js`
+
+```js
+module.exports = merge(common, {
+  mode: "production",
+  output: {
+    filename: "main.[hash].js",
+    path: path.resolve(__dirname, "dist"),
+    assetModuleFilename: "./imgs/[name].[hash].[ext]",
+  },
+});
+```
+
+After running npm run build, there is a `dist/imgs` folder generated which consists of the required image. Note the `index.html` now links to the d*ynamically generated image*.
+
+![image](https://user-images.githubusercontent.com/85299439/199204650-55af322d-5270-4034-865c-414917c638a3.png)
+
 ### How does webpack work ?
 
 **Tapable** - It is the backbone of the plugin system. It allows us to _mix your code_ with an _existing class_ and make **use of existing functions** like `apply plugins parallel` or `apply plugins async` etc.
