@@ -9,11 +9,6 @@ module.exports = merge(common, {
         path: path.resolve(__dirname, "dist"),
         assetModuleFilename: "./imgs/[name].[ext]",
     },
-    devServer: {
-        devMiddleware: {
-            writeToDisk: true
-        },
-    }
 
 })
 
