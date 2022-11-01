@@ -77,23 +77,73 @@ Example: We don't want to transpile any of the node_modules file. Hence we add `
 
 - Therefore the browser _doesn't retrieve the old file from cache_ but **rather makes a request to the server for the new file**.
 
-> How do we include these _dynamically generated hash files_ in the `index.html` (right now the script tag refers to main.js) ?!
+> How do we link these _dynamically generated hash files_ in the `index.html` (right now the script tag refers to main.js) ?!
 
 Answer: We don't write the script ourselves. We are going to have _webpack build HTML file_ for us so it would come up with the right script name and stick it to the bottom but to do that we need to learn about `Plugins`.
 
 [Read more on Cache Busting.](https://www.keycdn.com/support/what-is-cache-busting)
 
-- **Plugins** - An plugin is an `ES5 class` which implements an _apply function_ and allow you to hook into the entire compilation lifecycle.
+### Plugins
 
-The compiler uses it to **emit events**. It adds the _new instance_ to the `plugin key` in config object.
+The plugins option is used to **customize the webpack build process** in a variety of ways. Webpack has a rich plugin interface.
+
+- `HtmlWebpackPlugin` simplifies creation of HTML files which serves the webpack bundles. This is useful for webpack bundles that **include a hash in the filename** which _changes every compilation_.
+
+  Note: You can either _let the plugin generate_ an HTML file for you, _supply your own template_ using lodash templates.
+
+- To use `HtmlWebpackPlugin`, install the plugin and require it in `webpack.config.js` and add the plugin to webpack config as follows:
 
 ```js
-var HelloWorldPlugin = require('hello-world');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    plugins: [new HelloWorldPlugin({options: true})];
-}
+  mode: "development",
+  entry: "./src/index.js",
+  output: {
+    filename: "main.[hash].js",
+    path: path.resolve(__dirname, "dist"),
+  },
+  plugins: [new HtmlWebpackPlugin()],
+  module: {
+    rules: [
+      {
+        test: /\.scss$/,
+        use: [
+          "style-loader", //3. injects styles to DOM
+          "css-loader", //2. Turns css into commonjs
+          "sass-loader",
+        ], //1.  Turns sass into css
+      },
+    ],
+  },
+};
 ```
+
+Note: Images aren't working at this point. We'll come back to that
+
+![image](https://user-images.githubusercontent.com/85299439/199162490-8062a74a-f27c-47cb-b436-a6eaf4dbc07b.png)
+
+By adding the plugin to webpack config file, webpack generated a file `dist/index.html`. This file contains the **recently updated script** file. But our content is missing in the newly generated `index.html` file. Let's create _our own template_.
+
+#### Create own template:
+
+- Create a new html file in src folder (template.html).
+
+- Copy content from the original `src/index.html` file to `template.html`
+
+- _Remove script_ tag from `template.html` which contains the bundled file (dist/index.js) since this is taken care by `HtmlWebpackPlugin`.
+
+- Finally, add the template to `webpack.config.js` as below:
+
+```js
+    plugins: [new HtmlWebpackPlugin({
+        template: "./src/template.html"
+    })],
+```
+
+Now `dist/index.html` would contain content from `src/template.html` and _recently changed script file_.
+
+![image](https://user-images.githubusercontent.com/85299439/199166029-5f4be90b-0c70-437f-99fd-d6cf92cd774e.png)
 
 ### How does webpack work ?
 
