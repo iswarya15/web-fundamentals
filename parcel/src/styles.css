@@ -2,3 +2,7 @@ h1 {
     color: hotpink;
     font-family: cursive;
 }
+
+body {
+    padding-left: 20px;
+}
